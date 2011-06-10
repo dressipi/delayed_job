@@ -102,6 +102,10 @@ module Delayed
       end
 
       def hook(name, *args)
+        if Delayed::Worker.global_hooks[name]
+          Delayed::Worker.global_hooks[name].call(self, *args)
+        end
+        
         if payload_object.respond_to?(name)
           method = payload_object.method(name)
           method.arity == 0 ? method.call : method.call(self, *args)

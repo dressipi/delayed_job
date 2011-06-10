@@ -14,6 +14,12 @@ module Delayed
     self.default_priority = 0
     self.delay_jobs = true
 
+    cattr_accessor :global_hooks
+    self.global_hooks = {}
+    def self.hook(method_name, &block)
+      global_hooks[method_name] = block
+    end
+    
     # By default failed jobs are destroyed after too many attempts. If you want to keep them around
     # (perhaps to inspect the reason for the failure), set this to false.
     cattr_accessor :destroy_failed_jobs

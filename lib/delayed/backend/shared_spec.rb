@@ -344,6 +344,32 @@ shared_examples_for 'a delayed_job backend' do
       SimpleJob.runs = 0
     end
 
+    describe "global hooks" do
+      it "should invoke global hooks" do
+        
+        begin
+          Delayed::Worker.hook :before do
+            @before_called = true
+          end
+
+          Delayed::Worker.hook :success do
+            @success_called = true
+          end
+
+          Delayed::Worker.hook :after do
+            @after_called = true
+          end
+          job = create_job
+          worker.run(job)
+          @before_called.should be_true
+          @success_called.should be_true
+          @after_called.should be_true
+        ensure
+          Delayed::Worker.global_hooks = {}  
+        end
+      end
+    end
+    
     describe "running a job" do
       it "should fail after Worker.max_run_time" do
         begin
