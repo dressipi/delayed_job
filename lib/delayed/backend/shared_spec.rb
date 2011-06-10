@@ -348,15 +348,15 @@ shared_examples_for 'a delayed_job backend' do
       it "should invoke global hooks" do
         
         begin
-          Delayed::Worker.hook :before do
+          Delayed::Worker.global_hook :before do
             @before_called = true
           end
 
-          Delayed::Worker.hook :success do
+          Delayed::Worker.global_hook :success do
             @success_called = true
           end
 
-          Delayed::Worker.hook :after do
+          Delayed::Worker.global_hook :after do
             @after_called = true
           end
           job = create_job

@@ -16,10 +16,15 @@ module Delayed
 
     cattr_accessor :global_hooks
     self.global_hooks = {}
-    def self.hook(method_name, &block)
+    def self.global_hook(method_name, &block)
       global_hooks[method_name] = block
     end
     
+    def self.invoke_global_hook(hook_name, *args)
+      if global_hooks[hook_name]
+        global_hooks[hook_name].call(*args)
+      end
+    end
     # By default failed jobs are destroyed after too many attempts. If you want to keep them around
     # (perhaps to inspect the reason for the failure), set this to false.
     cattr_accessor :destroy_failed_jobs
@@ -81,6 +86,8 @@ module Delayed
       loop do
         result = nil
 
+        Delayed::Worker.invoke_global_hook(:work_off, self)
+        
         realtime = Benchmark.realtime do
           result = work_off
         end
